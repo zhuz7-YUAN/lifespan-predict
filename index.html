@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>寿命预测 · 你能活多少岁？</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',sans-serif;background:#f5f5fa;color:#333;line-height:1.6}
+.container{max-width:640px;margin:0 auto;padding:20px 16px 60px}
+.hero{text-align:center;padding:30px 0 20px}
+.hero-icon{font-size:52px}
+.hero-title{font-size:32px;font-weight:800;color:#1a1a2e;margin-top:8px}
+.hero-sub{font-size:15px;color:#888;margin-top:6px}
+.card{background:#fff;border-radius:14px;padding:22px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.section-title{font-size:18px;font-weight:700;color:#1a1a2e;margin-bottom:12px}
+.sex-row{display:flex;gap:12px}
+.sex-item{flex:1;text-align:center;padding:16px 0;border-radius:12px;border:2px solid #e8e8f0;font-size:16px;color:#666;cursor:pointer;transition:all .2s}
+.sex-item.active{border-color:#667eea;background:#eef0ff;color:#667eea;font-weight:700}
+.sex-emoji{display:block;font-size:28px;margin-bottom:4px}
+.picker-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:#f8f8fc;border-radius:12px;padding:16px;border:2px solid #e8e8f0;cursor:pointer}
+.year-num{font-size:36px;font-weight:800;color:#1a1a2e}
+select.year-select,select.prov-select{font-size:17px;padding:10px 12px;border-radius:10px;border:2px solid #e8e8f0;width:100%;margin-top:10px;background:#fff}
+.age-hint{text-align:center;margin-top:10px;font-size:14px;color:#999}
+.principle{background:linear-gradient(135deg,#fff9e6,#fff3cd)}
+.principle-title{font-size:16px;font-weight:700;color:#856404;margin-bottom:8px}
+.principle-text{font-size:14px;color:#666;line-height:1.8}
+.principle-text b{color:#856404}
+.progress-wrap{margin-bottom:20px}
+.progress-bar{height:8px;background:#e8e8f0;border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:4px;transition:width .3s;width:0%}
+.progress-text{text-align:right;font-size:13px;color:#999;margin-top:4px}
+.dim-tag{display:inline-block;background:#eef0ff;color:#667eea;font-size:12px;padding:3px 12px;border-radius:12px;margin:16px 0 8px}
+.question-card{padding:18px}
+.q-title{font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.q-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#667eea;color:#fff;border-radius:50%;font-size:13px;flex-shrink:0}
+.options{display:flex;flex-direction:column;gap:8px}
+.option{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;border:2px solid #e8e8f0;font-size:14px;color:#555;cursor:pointer;transition:all .15s}
+.option.selected{border-color:#667eea;background:#eef0ff;color:#667eea;font-weight:600}
+.radio{width:18px;height:18px;border-radius:50%;border:2px solid #ccc;flex-shrink:0;transition:all .15s}
+.radio.checked{border-color:#667eea;background:#667eea;box-shadow:inset 0 0 0 4px #fff}
+.btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:25px;padding:14px 32px;font-size:17px;font-weight:600;width:100%;cursor:pointer;margin-top:20px;box-shadow:0 4px 14px rgba(102,126,234,0.35)}
+.btn-primary:hover{opacity:.9}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.result-hero{text-align:center;padding:30px 0 16px}
+.result-label{font-size:15px;color:#888;letter-spacing:2px}
+.result-number{margin:8px 0}
+.num{font-size:80px;font-weight:800;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
+.unit{font-size:22px;color:#667eea;font-weight:600;margin-left:4px}
+.result-sub{font-size:15px;color:#666}
+.highlight{color:#667eea;font-weight:700;font-size:18px}
+.prob-row{display:flex;gap:10px;margin-bottom:16px}
+.prob-card{flex:1;background:#fff;border-radius:12px;padding:14px 6px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
+.prob-num{font-size:24px;font-weight:800;color:#1a1a2e}
+.prob-label{font-size:12px;color:#999;margin-top:4px}
+.range-card{padding:18px}
+.range-title{font-size:14px;color:#888;margin-bottom:12px}
+.range-bar{position:relative;height:10px;background:#e8e8f0;border-radius:5px}
+.range-fill{position:absolute;left:25%;right:25%;height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:5px}
+.range-marker{position:absolute;top:-4px;width:3px;height:18px;background:#e74c3c;border-radius:2px;left:50%}
+.range-labels{display:flex;justify-content:space-between;margin-top:8px;font-size:13px;color:#999}
+.range-mid{color:#e74c3c;font-weight:600}
+canvas{display:block;margin:0 auto;max-width:100%}
+.curve-hint{text-align:center;font-size:12px;color:#bbb;margin-top:8px}
+.beat-card{background:linear-gradient(135deg,#e8f5e9,#c8e6c9)}
+.beat-text{font-size:16px;color:#2e7d32;font-weight:600;text-align:center}
+.beat-highlight{font-size:22px;font-weight:800}
+.beat-sub{text-align:center;font-size:12px;color:#666;margin-top:6px}
+.detail-toggle{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.toggle-arrow{font-size:13px;color:#999}
+.factor-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f5f5fa;font-size:14px}
+.factor-row.total{border-top:2px solid #e8e8f0;border-bottom:none;font-weight:700;margin-top:6px}
+.factor-info{display:flex;flex-direction:column;gap:2px}
+.factor-dim{font-size:11px;color:#667eea;background:#eef0ff;padding:1px 8px;border-radius:6px;align-self:flex-start}
+.factor-title{color:#555}
+.factor-adj{font-weight:700;white-space:nowrap}
+.factor-adj.positive{color:#2e7d32}
+.factor-adj.negative{color:#e74c3c}
+.action-card{background:linear-gradient(135deg,#fff3e0,#ffe0b2)}
+.action-header{font-size:18px;font-weight:700;color:#e65100;margin-bottom:6px}
+.action-sub{font-size:13px;color:#bf360c;margin-bottom:16px}
+.action-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.7);border-radius:10px;margin-bottom:8px}
+.action-rank{width:28px;height:28px;border-radius:50%;background:#e65100;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.action-body{flex:1}
+.action-title{font-size:15px;font-weight:700;color:#bf360c}
+.action-detail{font-size:12px;color:#8d6e63;margin-top:2px}
+.action-gain{font-size:18px;font-weight:800;color:#e65100;white-space:nowrap}
+.action-total{margin-top:12px;padding-top:12px;border-top:2px dashed #ffcc80;font-size:15px;font-weight:700;color:#e65100;text-align:center}
+.back-link{text-align:center;color:#667eea;font-size:15px;margin-top:16px;padding:10px;cursor:pointer}
+.disclaimer{text-align:center;font-size:12px;color:#bbb;margin:20px 0 40px;line-height:1.6}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="container">
+  <div id="step1">
+    <div class="hero">
+      <div class="hero-icon">🧬</div>
+      <div class="hero-title">你能活多少岁？</div>
+      <div class="hero-sub">中国人口生命表 + 你的健康 + 社会经济状况</div>
+    </div>
+    <div class="card">
+      <div class="section-title">性别</div>
+      <div class="sex-row">
+        <div class="sex-item active" data-sex="male" onclick="pickSex(this)">♂<div>男性</div></div>
+        <div class="sex-item" data-sex="female" onclick="pickSex(this)">♀<div>女性</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">出生年份</div>
+      <div class="picker-btn"><span class="year-num" id="yearDisplay">1971</span></div>
+      <select class="year-select" id="yearSelect" onchange="changeYear(this.value)"></select>
+      <div class="age-hint">当前年龄：<span id="ageDisplay">55</span> 岁</div>
+    </div>
+    <div class="card">
+      <div class="section-title">常住省份</div>
+      <select class="prov-select" id="provSelect" onchange="changeProv(this.value)"></select>
+      <div class="age-hint">影响饮食、气候、医疗资源（七普 2020 省级数据）</div>
+    </div>
+    <div class="card">
+      <div class="section-title">身高体重</div>
+      <div style="display:flex;gap:12px">
+        <div style="flex:1">
+          <label style="font-size:13px;color:#999">身高 (cm)</label>
+          <input type="number" id="heightInput" class="year-select" placeholder="175" onchange="calcBMI()" oninput="calcBMI()">
+        </div>
+        <div style="flex:1">
+          <label style="font-size:13px;color:#999">体重 (kg)</label>
+          <input type="number" id="weightInput" class="year-select" placeholder="70" onchange="calcBMI()" oninput="calcBMI()">
+        </div>
+      </div>
+      <div class="age-hint" id="bmiDisplay">BMI：<span style="color:#667eea;font-weight:700" id="bmiValue">--</span> <span id="bmiLabel"></span></div>
+    </div>
+    <div class="card principle">
+      <div class="principle-title">💡 为什么"活过了"就不同？</div>
+      <div class="principle-text">
+        1971 年出生的男性，当年预期寿命约 51 岁。但你已经活到了 55 岁——
+        那些早逝的同龄人已经不在分母里了。就像"上了高中后一本率从 2% 升到 15%"一样，
+        <b>条件预期寿命</b>会随着你活得越久而提高。
+      </div>
+    </div>
+    <button class="btn-primary" onclick="startQuiz()">开始测算 →</button>
+  </div>
+
+  <div id="step2" class="hidden">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-text" id="progressText">0 / 18 题</div>
+    </div>
+    <div id="quizContainer"></div>
+    <button class="btn-primary" id="resultBtn" onclick="showResult()" disabled>查看结果 →</button>
+    <div class="disclaimer">本工具仅供娱乐与科普参考，不构成医学建议。</div>
+  </div>
+
+  <div id="step3" class="hidden">
+    <div class="result-hero">
+      <div class="result-label">预计寿命</div>
+      <div class="result-number"><span class="num" id="predAge">--</span><span class="unit">岁</span></div>
+      <div class="result-sub">还能活 <span class="highlight" id="exRemain">--</span> 年</div>
+    </div>
+    <div class="prob-row">
+      <div class="prob-card"><div class="prob-num" id="p75">--</div><div class="prob-label">活到 75</div></div>
+      <div class="prob-card"><div class="prob-num" id="p85">--</div><div class="prob-label">活到 85</div></div>
+      <div class="prob-card"><div class="prob-num" id="p90">--</div><div class="prob-label">活到 90</div></div>
+    </div>
+    <div class="card range-card">
+      <div class="range-title">50% 概率区间</div>
+      <div class="range-bar"><div class="range-fill"></div><div class="range-marker"></div></div>
+      <div class="range-labels">
+        <span id="p25Label">--</span>
+        <span class="range-mid" id="medLabel">--</span>
+        <span id="p75Label">--</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">你的存活曲线</div>
+      <canvas id="curveCanvas" width="580" height="300"></canvas>
+      <div class="curve-hint">红线 = 预计死亡年龄 · 阴影 = 50% 概率区间</div>
+    </div>
+    <div class="card beat-card">
+      <div class="beat-text">你的综合条件让你<span class="beat-highlight" id="beatPct">--</span>的同龄人</div>
+      <div class="beat-sub" id="beatSub">--</div>
+    </div>
+    <div class="card action-card" id="actionCard">
+      <div class="action-header">📋 你的行动清单</div>
+      <div class="action-sub">改变可改变的，每条标注潜在增寿年数</div>
+      <div id="actionList"></div>
+      <div class="action-total" id="actionTotal"></div>
+    </div>
+    <div class="card">
+      <div class="section-title detail-toggle" onclick="toggleDetail()">
+        <span>因子拆解</span><span class="toggle-arrow" id="detailArrow">▼</span>
+      </div>
+      <div id="detailBody" class="hidden"></div>
+    </div>
+    <button class="btn-primary" onclick="location.reload()">🔄 重新测算</button>
+    <div class="disclaimer">
+      基于中国 2020 年人口普查生命表、七普省级数据与流行病学研究，仅供娱乐与科普参考。<br>
+      个体差异远大于模型精度，请勿作为医学或保险依据。
+    </div>
+  </div>
+</div>
+
+<script>
+const LIFE_TABLE={"male":{"qx":[0.00672,0.00042,0.00032,0.00026,0.0002,0.00016,0.00013,0.00011,0.0001,0.0001,0.00011,0.00012,0.00014,0.00017,0.00021,0.00026,0.00032,0.00038,0.00043,0.00047,0.0005,0.00051,0.00051,0.00051,0.00052,0.00053,0.00055,0.00058,0.00062,0.00067,0.00039,0.00043,0.00048,0.00053,0.00059,0.00065,0.00072,0.0008,0.00089,0.00098,0.00109,0.00122,0.00135,0.0015,0.00167,0.00185,0.00205,0.00228,0.00253,0.0028,0.00311,0.00345,0.00382,0.00424,0.0047,0.00521,0.00578,0.00641,0.0071,0.00787,0.00872,0.00966,0.01071,0.01187,0.01316,0.01459,0.01618,0.01795,0.01992,0.02211,0.02456,0.02728,0.03033,0.03374,0.03755,0.04182,0.04661,0.05198,0.05803,0.06483,0.0725,0.08114,0.09089,0.10192,0.1144,0.12856,0.14462,0.16288,0.18365,0.20736,0.23455,0.26583,0.30197,0.34386,0.39258,0.44938,0.51578,0.59358,0.68487,0.79215,0.91833,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"ex":[75.687,75.385,74.476,73.564,72.65,71.735,70.818,69.9,68.982,68.063,67.144,66.225,65.307,64.39,63.475,62.563,61.655,60.753,59.859,58.974,58.1,57.238,56.388,55.552,54.731,53.925,53.136,52.363,51.608,50.872,50.155,49.458,48.782,48.128,47.496,46.888,46.304,45.745,45.213,44.708,44.231,43.784,43.367,42.981,42.628,42.308,42.023,41.773,41.56,41.385,41.249,41.153,41.098,41.085,41.115,41.189,41.307,41.472,41.684,41.945,42.256,42.619,43.035,43.506,44.034,44.621,45.27,45.983,46.763,47.613,48.537,49.539,50.622,51.791,53.05,54.405,55.861,57.425,59.102,60.899,62.822,64.879,67.078,69.427,71.934,74.609,77.462,80.503,83.744,87.197,90.874,94.789,98.956,103.39,108.108,113.124,118.458,124.127,130.152,136.554,143.355,150.581,158.261,166.424,175.105,184.342,194.177,204.656,215.832,227.762,240.506,254.129,268.703,284.305,301.019,318.937,338.159,358.796,380.97,404.808,430.45,458.042],"lx":[100000,99328,99286,99254,99228,99208,99192,99179,99168,99158,99148,99137,99125,99111,99094,99073,99047,99015,98978,98935,98887,98837,98787,98736,98685,98633,98579,98522,98462,98398,98331,98259,98181,98098,98010,98010,97914,97812,97704,97589,97468,97340,97206,97064,96914,96755,96587,96410,96222,96022,95809,95582,95340,95082,94806,94512,94197,93861,93502,93118,92708,92270,91802,91302,90768,90198,89590,88941,88249,87511,86725,85888,84997,84050,83044,81975,80840,79636,78360,77008,75577,74063,72463,70773,68989,67107,65122,63031,60830,58515,56082,53527,50846,48035,45090,42007,38782,35410,31886,28205,24362,20351,16166,11800,7249,2509,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"female":{"qx":[0.0059,0.00035,0.00026,0.0002,0.00016,0.00012,0.0001,0.00008,0.00008,0.00008,0.00008,0.00009,0.0001,0.00011,0.00013,0.00015,0.00017,0.00019,0.0002,0.00021,0.00022,0.00022,0.00022,0.00022,0.00023,0.00024,0.00025,0.00027,0.00029,0.00031,0.00034,0.00038,0.00042,0.00047,0.00053,0.00059,0.00067,0.00075,0.00084,0.00095,0.00108,0.00121,0.00137,0.00154,0.00174,0.00195,0.00219,0.00246,0.00276,0.00309,0.00345,0.00386,0.00432,0.00483,0.0054,0.00603,0.00675,0.00755,0.00845,0.00946,0.01061,0.0119,0.01336,0.01501,0.01688,0.019,0.02141,0.02415,0.02727,0.03084,0.03492,0.03959,0.04495,0.05111,0.05821,0.0664,0.07586,0.08682,0.09952,0.11426,0.13139,0.15131,0.17452,0.20159,0.2332,0.27015,0.31337,0.36401,0.42339,0.49321,0.57549,0.67271,0.78787,0.92461,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"ex":[80.88,80.641,79.722,78.8,77.878,76.956,76.033,75.11,74.187,73.265,72.343,71.421,70.5,69.58,68.662,67.747,66.835,65.928,65.026,64.131,63.243,62.364,61.495,60.636,59.789,58.955,58.134,57.328,56.538,55.765,55.01,54.274,53.558,52.864,52.191,51.542,50.918,50.32,49.75,49.21,48.701,48.225,47.783,47.378,47.011,46.684,46.399,46.157,45.961,45.813,45.714,45.667,45.673,45.735,45.854,46.032,46.272,46.576,46.947,47.388,47.903,48.494,49.166,49.923,50.768,51.707,52.746,53.89,55.147,56.523,58.027,59.668,61.455,63.4,65.514,67.81,70.299,72.997,75.92,79.086,82.514,86.226,90.245,94.594,99.299,104.389,109.895,115.851,122.294,129.266,136.812,144.982,153.831,163.422,173.822,185.108,197.366,210.692,225.188,240.97,258.165,276.916,297.382,319.739,344.18,370.921,400.198,432.275,467.44,506.014,548.351,594.843,645.917,702.037,763.71,831.483,905.944,987.72,1077.48,1175.95,1283.91,1402.2,1531.74],"lx":[100000,99410,99375,99349,99329,99313,99303,99295,99287,99279,99271,99262,99253,99243,99232,99219,99204,99187,99168,99148,99127,99105,99083,99061,99039,99017,98993,98968,98941,98913,98882,98849,98812,98771,98726,98677,98622,98562,98495,98422,98341,98252,98154,98047,97930,97801,97660,97506,97338,97155,96956,96739,96502,96245,95965,95661,95331,94973,94585,94164,93708,93214,92680,92102,91477,90802,90073,89287,88439,87526,86542,85483,84343,83118,81802,80390,78877,77258,75527,73678,71704,69598,67353,64961,62414,59703,56821,53759,50507,47058,43403,39533,35439,31112,26543,21724,16646,11300,5680,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}};
+const META={"male":{"e0":75.69,"p75":0.6719,"e55":23.54,"q25":73,"med":81,"q75":84},"female":{"e0":80.88,"p75":0.8128,"e55":27.63,"q25":79,"med":84,"q75":87}};
+
+const PROVINCE_E0={"上海":83.67,"北京":82.43,"天津":81.3,"浙江":80.96,"江苏":79.82,"广东":79.31,"辽宁":78.55,"山东":78.53,"重庆":78.27,"福建":78.23,"海南":78.03,"湖北":77.97,"吉林":77.83,"安徽":77.82,"河南":77.65,"湖南":77.54,"河北":77.39,"江西":77.16,"四川":77.13,"陕西":77.07,"黑龙江":77.03,"山西":76.7,"内蒙古":76.43,"宁夏":76.13,"广西":76.06,"新疆":75.63,"甘肃":75.25,"贵州":74.19,"青海":74.17,"云南":74.02,"西藏":72.19};
+const NATIONAL_E0=77.93,PROVINCE_SCALE=0.4;
+function provinceAdj(p){if(!p||!(p in PROVINCE_E0))return 0;return Math.round((PROVINCE_E0[p]-NATIONAL_E0)*PROVINCE_SCALE*10)/10}
+
+const QUESTIONS=[
+{id:'smoke',dim:'生活方式',title:'吸烟情况',modifiable:true,action:'戒烟',options:[{label:'从不吸烟',adj:0},{label:'已戒 > 5 年',adj:-0.8},{label:'已戒 < 5 年',adj:-2.5},{label:'每日 < 10 支',adj:-4},{label:'每日 10-20 支',adj:-6},{label:'每日 > 20 支',adj:-8}]},
+{id:'drink',dim:'生活方式',title:'饮酒情况',modifiable:true,action:'减少饮酒',options:[{label:'从不 / 偶尔',adj:0},{label:'适量（每周 1-7 杯）',adj:-0.3},{label:'偏多（每周 8-14 杯）',adj:-2},{label:'过量（每周 > 14 杯）',adj:-4.5}]},
+{id:'bmi',dim:'生活方式',title:'BMI 体重指数',modifiable:true,action:'减重到正常范围',options:[{label:'< 18.5 偏瘦',adj:-1.5},{label:'18.5 - 23.9 正常',adj:0},{label:'24 - 27.9 超重',adj:-1},{label:'28 - 31.9 肥胖',adj:-3},{label:'≥ 32 重度肥胖',adj:-5.5}]},
+{id:'exercise',dim:'生活方式',title:'规律运动',modifiable:true,action:'增加运动到每周 150 分钟',options:[{label:'每周 ≥ 150 分钟',adj:3},{label:'每周 75-150 分钟',adj:1.5},{label:'每周 30-75 分钟',adj:0.5},{label:'几乎不运动',adj:-1.5}]},
+{id:'bp',dim:'慢病体检',title:'血压状况',modifiable:true,action:'控制血压',options:[{label:'正常',adj:0},{label:'偏高（未服药）',adj:-1.2},{label:'高血压 · 服药控制中',adj:-0.4},{label:'高血压 · 未控制',adj:-3}]},
+{id:'glucose',dim:'慢病体检',title:'血糖 / 糖尿病',modifiable:true,action:'控制血糖',options:[{label:'正常',adj:0},{label:'糖尿病前期',adj:-1},{label:'糖尿病 · 控制良好',adj:-2},{label:'糖尿病 · 控制不佳',adj:-4.5}]},
+{id:'lipid',dim:'慢病体检',title:'血脂',modifiable:true,action:'控制血脂',options:[{label:'正常',adj:0},{label:'偏高（未服药）',adj:-1},{label:'偏高 · 服药控制',adj:-0.3}]},
+{id:'major_disease',dim:'慢病体检',title:'重大疾病史',modifiable:false,options:[{label:'无',adj:0},{label:'有，已康复 > 5 年',adj:-1},{label:'心脑血管病史',adj:-3.5},{label:'癌症病史',adj:-4}]},
+{id:'family_longevity',dim:'家族史',title:'父母寿命',modifiable:false,options:[{label:'均 < 70 岁',adj:-2},{label:'一人 ≥ 80 岁',adj:0},{label:'均 ≥ 80 岁',adj:2},{label:'均 ≥ 90 岁',adj:3},{label:'不清楚',adj:0}]},
+{id:'family_disease',dim:'家族史',title:'家族慢性病史',modifiable:false,options:[{label:'无明显家族病史',adj:0},{label:'三高 / 糖尿病',adj:-0.8},{label:'癌症 / 心脏病',adj:-1.5},{label:'两者都有',adj:-2}]},
+{id:'sleep',dim:'心理社交',title:'睡眠时长',modifiable:true,action:'改善睡眠到 7-8 小时',options:[{label:'7-8 小时',adj:1},{label:'6-7 小时',adj:0},{label:'< 6 小时',adj:-2},{label:'> 9 小时',adj:-1}]},
+{id:'social',dim:'心理社交',title:'社交与人际关系',modifiable:true,action:'增加社交活动',options:[{label:'活跃（经常来往）',adj:1},{label:'一般',adj:0},{label:'较孤独 / 独居少社交',adj:-2.5}]},
+{id:'stress',dim:'心理社交',title:'压力与情绪',modifiable:true,action:'管理压力 / 情绪疏导',options:[{label:'良好',adj:0.5},{label:'一般',adj:0},{label:'长期高压 / 焦虑',adj:-1.5},{label:'抑郁倾向',adj:-2.5}]},
+{id:'insurance',dim:'社会保障',title:'医保状况',modifiable:true,action:'补充商业医疗保险',options:[{label:'城镇职工医保 / 公费',adj:1.5},{label:'城乡居民医保 / 新农合',adj:0.5},{label:'商业保险为主',adj:1},{label:'无医保',adj:-3}]},
+{id:'pension',dim:'社会保障',title:'养老保障',modifiable:false,options:[{label:'机关事业单位退休金',adj:2},{label:'企业职工养老金',adj:0.5},{label:'城乡居民养老保险',adj:-1},{label:'无退休金 / 靠积蓄或子女',adj:-3}]},
+{id:'marital',dim:'家庭状况',title:'婚姻 / 伴侣状况',modifiable:true,action:'维系亲密关系 / 参加社群',options:[{label:'已婚 / 有伴侣同住',adj:1.5},{label:'有伴侣但分居',adj:0},{label:'离异 / 未婚独居',adj:-1.5},{label:'丧偶独居',adj:-2.5}]},
+{id:'caregiving',dim:'家庭状况',title:'家庭照护负担',modifiable:false,options:[{label:'无',adj:0},{label:'需照顾老人 / 失能亲属',adj:-2},{label:'夹心层（上养老下养小）',adj:-3}]},
+{id:'children',dim:'家庭状况',title:'子女经济关系',modifiable:false,options:[{label:'子女独立 / 无需操心',adj:0},{label:'需持续补贴子女',adj:-1.5},{label:'靠子女赡养',adj:-1}]}
+];
+const COHORT_ADJ=1.5,MAX_PREDICTED_AGE=98,DIMINISH_A=8;
+function diminishingReturns(adj){if(adj===0)return 0;return Math.sign(adj)*DIMINISH_A*Math.log1p(Math.abs(adj)/DIMINISH_A)}
+function calcBMIVal(h,w){if(!h||!w)return null;const m=h/100;return Math.round(w/(m*m)*10)/10}
+function bmiCat(b){if(b<18.5)return{label:'偏瘦',adj:-1.5,idx:0};if(b<24)return{label:'正常',adj:0,idx:1};if(b<28)return{label:'超重',adj:-1,idx:2};if(b<32)return{label:'肥胖',adj:-3,idx:3};return{label:'重度肥胖',adj:-5.5,idx:4}}
+function bmiDisplay(){const h=parseFloat(document.getElementById('heightInput').value),w=parseFloat(document.getElementById('weightInput').value);const b=calcBMIVal(h,w);if(b){const c=bmiCat(b);document.getElementById('bmiValue').textContent=b;document.getElementById('bmiLabel').textContent=c.label;window._bmiIdx=c.idx}else{document.getElementById('bmiValue').textContent='--';document.getElementById('bmiLabel').textContent='';window._bmiIdx=undefined}}
+
+let sex='male',birthYear=1971,province='湖北',answers={};
+
+(function(){
+  const ys=document.getElementById('yearSelect');
+  for(let y=2025;y>=1925;y--){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===1971)o.selected=true;ys.appendChild(o)}
+  const ps=document.getElementById('provSelect');
+  Object.keys(PROVINCE_E0).forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;if(p==='湖北')o.selected=true;ps.appendChild(o)});
+})();
+
+function pickSex(el){document.querySelectorAll('.sex-item').forEach(e=>e.classList.remove('active'));el.classList.add('active');sex=el.dataset.sex}
+function changeYear(y){birthYear=parseInt(y);document.getElementById('yearDisplay').textContent=y;document.getElementById('ageDisplay').textContent=Math.max(0,new Date().getFullYear()-birthYear)}
+function changeProv(p){province=p}
+function startQuiz(){document.getElementById('step1').classList.add('hidden');document.getElementById('step2').classList.remove('hidden');renderQuiz()}
+
+function renderQuiz(){
+  const c=document.getElementById('quizContainer');c.innerHTML='';let lastDim='';
+  QUESTIONS.forEach((q,i)=>{
+    if(q.dim!==lastDim){c.innerHTML+=`<div class="dim-tag">${q.dim}</div>`;lastDim=q.dim}
+    const opts=q.options.map((o,j)=>`<div class="option" data-qid="${q.id}" data-idx="${j}" onclick="pickOption(this)"><div class="radio"></div><span>${o.label}</span></div>`).join('');
+    c.innerHTML+=`<div class="card question-card"><div class="q-title"><span class="q-num">${i+1}</span><span>${q.title}</span></div><div class="options">${opts}</div></div>`;
+  });
+}
+
+function pickOption(el){
+  const qid=el.dataset.qid,idx=parseInt(el.dataset.idx);
+  el.parentElement.querySelectorAll('.option').forEach(o=>{o.classList.remove('selected');o.querySelector('.radio').classList.remove('checked')});
+  el.classList.add('selected');el.querySelector('.radio').classList.add('checked');
+  answers[qid]=idx;updateProgress();
+}
+
+function updateProgress(){
+  const n=Object.keys(answers).length,t=QUESTIONS.length;
+  document.getElementById('progressFill').style.width=(n/t*100)+'%';
+  document.getElementById('progressText').textContent=`${n} / ${t} 题`;
+  document.getElementById('resultBtn').disabled=n<t;
+}
+
+function normCdf(z){const t=1/(1+0.2316419*Math.abs(z)),d=0.3989423*Math.exp(-z*z/2);const p=d*t*(1.330274*t*t-1.821256*t**3+1.781478*t**4-0.3565638*t**5+0.3193815*t**6);return z>0?1-p:p}
+
+function getActionableSuggestions(ans){
+  const list=[];
+  for(const q of QUESTIONS){
+    if(!q.modifiable)continue;const ci=ans[q.id];if(ci===undefined)continue;
+    const cur=q.options[ci].adj,best=Math.max(...q.options.map(o=>o.adj)),gain=best-cur;
+    if(gain<0.5)continue;
+    list.push({action:q.action||q.title,current:q.options[ci].label,target:q.options.find(o=>o.adj===best).label,gain:Math.round(gain*10)/10});
+  }
+  return list.sort((a,b)=>b.gain-a.gain);
+}
+
+function predict(){
+  const age=Math.max(0,Math.min(109,new Date().getFullYear()-birthYear));
+  const baseEx=LIFE_TABLE[sex].ex[age],provAdj=provinceAdj(province);
+  // BMI 自动注入
+  if(window._bmiIdx!==undefined)answers={...answers,bmi:window._bmiIdx};
+  let healthRaw=0;const breakdown=[];
+  for(const q of QUESTIONS){const i=answers[q.id];if(i===undefined)continue;const o=q.options[i];healthRaw+=o.adj;if(o.adj!==0)breakdown.push({dim:q.dim,title:q.title,label:o.label,adj:o.adj})}
+  // ★ 边际效应：对数饱和
+  const effectiveHealth=diminishingReturns(healthRaw);
+  const capped=Math.max(-12,Math.min(8,effectiveHealth));
+  let totalAdj=capped+provAdj+COHORT_ADJ;totalAdj=Math.max(-15,Math.min(10,totalAdj));
+  const adjustedEx=Math.max(3,baseEx+totalAdj);
+  const predictedAge=Math.min(MAX_PREDICTED_AGE,age+adjustedEx);
+  const sigma=Math.max(4,(META[sex].q75-META[sex].q25)/1.349*(1+capped*0.02));
+  const pr=t=>t<=age?1:1-normCdf((t-predictedAge)/sigma);
+  return{age,baseEx,provAdj,province,bmi:calcBMIVal(parseFloat(document.getElementById('heightInput').value),parseFloat(document.getElementById('weightInput').value)),healthAdj:capped,healthRaw:Math.round(healthRaw*10)/10,diminishingNote:healthRaw!==0?'原始 '+Math.round(healthRaw*10)/10+' 年 → 边际效应后 '+Math.round(capped*10)/10+' 年':'',totalAdj,adjustedEx,predictedAge,
+    p25Age:predictedAge-0.674*sigma,p75Age:predictedAge+0.674*sigma,
+    probReach75:Math.round(pr(75)*1000)/10,probReach85:Math.round(pr(85)*1000)/10,probReach90:Math.round(pr(90)*1000)/10,
+    beatPercentile:Math.round(normCdf(totalAdj/sigma)*1000)/10,breakdown,suggestions:getActionableSuggestions(answers)};
+}
+
+function showResult(){
+  document.getElementById('step2').classList.add('hidden');
+  document.getElementById('step3').classList.remove('hidden');
+  const r=predict();
+  document.getElementById('predAge').textContent=r.predictedAge.toFixed(1);
+  document.getElementById('exRemain').textContent=r.adjustedEx.toFixed(1);
+  document.getElementById('p75').textContent=r.probReach75+'%';
+  document.getElementById('p85').textContent=r.probReach85+'%';
+  document.getElementById('p90').textContent=r.probReach90+'%';
+  document.getElementById('p25Label').textContent=r.p25Age.toFixed(0)+' 岁';
+  document.getElementById('medLabel').textContent='中位 '+r.predictedAge.toFixed(0)+' 岁';
+  document.getElementById('p75Label').textContent=r.p75Age.toFixed(0)+' 岁';
+  document.getElementById('beatPct').textContent='跑赢了 '+r.beatPercentile+'%';
+  document.getElementById('beatSub').textContent=`${r.province} · 基线 ${r.baseEx.toFixed(1)} 年 → 省份 ${r.provAdj>=0?'+':''}${r.provAdj} 年 → 健康 ${r.healthAdj>=0?'+':''}${r.healthAdj.toFixed(1)} 年 → 医疗进步 +${COHORT_ADJ} 年`;
+
+  const al=document.getElementById('actionList');
+  if(r.suggestions.length===0){
+    al.innerHTML='<div style="text-align:center;padding:20px;color:#2e7d32;font-size:16px">🎉 你的生活方式已经很好了，没有需要改进的大项！</div>';
+    document.getElementById('actionTotal').textContent='';
+  }else{
+    al.innerHTML=r.suggestions.map((s,i)=>`<div class="action-item"><div class="action-rank">${i+1}</div><div class="action-body"><div class="action-title">${s.action}</div><div class="action-detail">${s.current} → ${s.target}</div></div><div class="action-gain">+${s.gain} 年</div></div>`).join('');
+    const totalGain=r.suggestions.reduce((a,b)=>a+b.gain,0);
+    document.getElementById('actionTotal').textContent=`全部改善的潜在增寿：最多 +${Math.round(totalGain*10)/10} 年（实际效果因人而异）`;
+  }
+
+  let html='';
+  for(const b of r.breakdown)html+=`<div class="factor-row"><div class="factor-info"><span class="factor-dim">${b.dim}</span><span class="factor-title">${b.title}：${b.label}</span></div><span class="factor-adj ${b.adj>0?'positive':'negative'}">${b.adj>0?'+':''}${b.adj} 年</span></div>`;
+  html+=`<div class="factor-row"><span>省份（${r.province}）</span><span class="factor-adj ${r.provAdj>=0?'positive':'negative'}">${r.provAdj>=0?'+':''}${r.provAdj} 年</span></div>`;
+  html+=`<div class="factor-row total"><span>合计调整</span><span class="factor-adj ${r.totalAdj>=0?'positive':'negative'}">${r.totalAdj>=0?'+':''}${r.totalAdj.toFixed(1)} 年</span></div>`;
+  html+=`<div class="factor-row"><span>队列 / 医疗进步</span><span class="factor-adj positive">+${COHORT_ADJ} 年</span></div>`;
+  document.getElementById('detailBody').innerHTML=html;
+  drawCurve(r);
+}
+
+function toggleDetail(){const b=document.getElementById('detailBody'),a=document.getElementById('detailArrow');b.classList.toggle('hidden');a.textContent=b.classList.contains('hidden')?'▼':'▲'}
+
+function drawCurve(r){
+  const canvas=document.getElementById('curveCanvas'),ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height,padL=50,padR=15,padT=30,padB=40,cW=W-padL-padR,cH=H-padT-padB;
+  const minAge=r.age,maxAge=100;
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#f0f0f5';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=padT+cH*i/4;ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(W-padR,y);ctx.stroke();ctx.fillStyle='#999';ctx.font='12px sans-serif';ctx.textAlign='right';ctx.fillText((100-i*25)+'%',padL-6,y+4)}
+  const lx=LIFE_TABLE[sex].lx,lx0=lx[r.age]||1,shift=r.predictedAge-(r.age+LIFE_TABLE[sex].ex[r.age]);
+  const pts=[];for(let a=minAge;a<=maxAge;a++){const idx=Math.round(a-shift);pts.push({age:a,prob:(idx>=0&&idx<=110)?Math.max(0,Math.min(1,lx[idx]/lx0)):0})}
+  const x25=padL+(Math.max(r.p25Age,minAge)-minAge)/(maxAge-minAge)*cW,x75=padL+(Math.min(r.p75Age,maxAge)-minAge)/(maxAge-minAge)*cW;
+  ctx.fillStyle='rgba(231,76,60,0.08)';ctx.fillRect(x25,padT,x75-x25,cH);
+  ctx.beginPath();pts.forEach((p,i)=>{const x=padL+(p.age-minAge)/(maxAge-minAge)*cW,y=padT+(1-p.prob)*cH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});
+  ctx.strokeStyle='#667eea';ctx.lineWidth=3;ctx.stroke();
+  ctx.lineTo(padL+cW,padT+cH);ctx.lineTo(padL,padT+cH);ctx.closePath();ctx.fillStyle='rgba(102,126,234,0.12)';ctx.fill();
+  const mx=padL+(Math.min(Math.max(r.predictedAge,minAge),maxAge)-minAge)/(maxAge-minAge)*cW;
+  ctx.beginPath();ctx.setLineDash([6,4]);ctx.moveTo(mx,padT);ctx.lineTo(mx,padT+cH);ctx.strokeStyle='#e74c3c';ctx.lineWidth=2;ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#e74c3c';ctx.textAlign='center';ctx.font='bold 13px sans-serif';ctx.fillText('预计 '+Math.round(r.predictedAge)+' 岁',mx,padT-8);
+  ctx.fillStyle='#999';ctx.textAlign='center';ctx.font='12px sans-serif';
+  for(let a=Math.ceil(minAge/10)*10;a<=maxAge;a+=10){const x=padL+(a-minAge)/(maxAge-minAge)*cW;ctx.fillText(String(a),x,H-12)}
+}
+</script>
+</body>
+</html>
